@@ -1,113 +1,44 @@
-package Programmers;
-
+package programmers;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class Binary_Search {
-
-	static int[] rocks = {3,6,9,10,14,17};
-	static int totalDistance;
-	public static void main(String[] args) {
-		totalDistance = 23;
-		int n = 2;
-		int answer = 0;
-		Arrays.sort(rocks);
+	public static void main(String[] args) throws IOException {
 		
-		int start = 0;
-		int end = totalDistance;
+		long answer = 0;
 		
+		long n = 1000000000;
+		int[] times = {7,1000000000};
 		
-		// best
-		while(start <= end) {
-			int mid = (start + end) / 2;
-			int hits = 0;
-			int cur = 0;
-			for(int i = 0; i<rocks.length; i++) {
-				
-				if(rocks[i] - cur < mid) {
-					hits++;
-				}
-				else {
-					cur = rocks[i];
-				}
-			}
-			
-			if(n < hits) { // 깬 돌이 n개보다 많을 때,
-				end = mid - 1;
-			}
-			else {
-				start = mid + 1;
-			}
-		}
+		Arrays.sort(times);
+		long start = 1;
+		long end = times[times.length-1] * n;
 		System.out.println(end);
-		
-		/* my solution
-		while(start <= end) {
-			int mid = (start+end)/2;
-			System.out.println(start + ", " + end);
+		while(start <= end) { //lower bound
+			long mid = (start + end) / 2;
+			long result = cal(mid, times);
 			
-			if(delete(mid,n)) {
+			if(n > result) { // mid타임으로 처리할 수 있는 사람 수가 n 보다 적을 때,
 				start = mid + 1;
 			}
-			else {
+			else if(n < result) { // mid타임으로 처리할 수 있는 사람 수가 n 보다 많을 때,
+				end = mid - 1;
+			}
+			else { //mid타임으로 처리할 수 있는 사람 수가 n과 같을 때,
 				end = mid - 1;
 			}
 		}
 		
-		
-		System.out.println(end);*/
+		System.out.println(start);
 	}
 	
-	// my solution
-	static boolean delete(int distance, int n) {
+	static long cal(long mid, int[] times) {
+		long process = 0;
 		
-		int[] cloneRocks = new int[rocks.length+2];
-
-		
-		cloneRocks[0] = 0;
-		cloneRocks[rocks.length+1] = totalDistance;
-		for(int i = 1; i< rocks.length+1; i++)
-			cloneRocks[i] = rocks[i-1];
-		
-		for(int i = 1; i<cloneRocks.length-1; i++) {
-			int frontDistance = cloneRocks[i] - cloneRocks[i-1];
-			int afterDistance = cloneRocks[i+1] - cloneRocks[i];
-			
-			if(frontDistance < distance && afterDistance >= distance) {
-				/*if(i == 1) {
-					n--;
-					cloneRocks[i] = cloneRocks[i-1];
-				}
-				else {
-					if(cloneRocks[i-2] - cloneRocks[])
-				}*/
-				n--;
-				cloneRocks[i] = cloneRocks[i-1];
-			}
-			
-			else if(afterDistance < distance && frontDistance >= distance) {
-				if(i == cloneRocks.length-2 ) {
-					n--;
-					cloneRocks[i] = cloneRocks[i-1];
-				}
-				else {
-					if(cloneRocks[i+2] - cloneRocks[i+1] < distance) {
-						continue;
-					}
-				}
-			}
-			
-			else if(afterDistance < distance && frontDistance < distance) {
-				n--;
-				cloneRocks[i] = cloneRocks[i-1];
-			}
-			
-			if(n < 0) {
-				return false;
-			}
+		for(int i = 0; i<times.length; i++) {
+			process += (mid/times[i]);
 		}
 		
-		
-		return true;
-		
+		return process;
 	}
 }
