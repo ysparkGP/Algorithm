@@ -6,57 +6,46 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
-/**
- * 
- * TSP(Traveling Salesman Problem) 외판원 순회 문제
- * DP + BitMasking, 메모이제이션으로 성능 최적화
- *
+/*
+ * tsp
  */
 
 public class Test2098 {
 
+	static int[][] graph;
 	static int[][] dp;
-	static int[][] map;
-	static int maxBit, N;
-	static int INF = 256000000;
+	static int N;
+	final static int noWay = 17_000_000;
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		N = Integer.parseInt(br.readLine());
-		maxBit = (1 << N) - 1;
-		
-		map = new int[N][N];
-		dp = new int[N][maxBit];
-		for(int i = 0; i<N; i++)
-			Arrays.fill(dp[i], INF);
-		
+		graph = new int[N][N];
 		for(int i = 0; i<N; i++) {
 			StringTokenizer st = new StringTokenizer(br.readLine()," ");
-			for(int j = 0;  j<N; j++) {
-				map[i][j] = Integer.parseInt(st.nextToken());
+			for(int j = 0; j<N; j++) {
+				graph[i][j] = Integer.parseInt(st.nextToken());
+				if(graph[i][j] == 0) graph[i][j] = noWay;
 			}
 		}
+		dp = new int[N][1<<N];
+		for(int i = 0; i<N; i++)
+			Arrays.fill(dp[i], -1);
 		
-		System.out.println(tsp(0,1));
+		
+		System.out.println(tsp(0,1<<0));
 	}
 	
-	static int tsp(int now, int check) {
-		if(check == maxBit) {
-			if(map[now][0] == 0) return INF;
-			else return map[now][0];
-		}
+	public static int tsp(int cur, int bit) {
+		if(dp[cur][bit] != -1) return dp[cur][bit];
+		if(bit == (1<<N)-1) return graph[cur][0];
 		
-		// Memoization
-		if(dp[now][check] != INF) return dp[now][check];
-		
+		dp[cur][bit] = noWay;
 		for(int i = 0; i<N; i++) {
-			
-			int nextCheck = check | (1<<i);
-			// 길이 없거나, 방문한 도시라면
-			if(nextCheck == check || map[now][i]==0) continue;
-			dp[now][check] = Math.min(dp[now][check], map[now][i] + tsp(i,nextCheck));
+			if((bit & (1<<i)) > 0 || graph[cur][i] == noWay) continue;
+			dp[cur][bit] = Math.min(dp[cur][bit], tsp(i, bit|(1<<i)) + graph[cur][i]);
 		}
 		
-		return dp[now][check];
+		return dp[cur][bit];
 	}
 
 }
