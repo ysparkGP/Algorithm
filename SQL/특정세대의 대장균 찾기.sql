@@ -1,0 +1,24 @@
+/*
+* MYSQL 
+* 계층형 쿼리
+* 계층형 쿼리를 사용하여 자식, 부모 레코드들을 생성한 뒤 3세대인 레코드들만 출력
+*/
+
+-- 임시 테이블 컬럼명 지정
+WITH RECURSIVE CTE(ID, PARENT_ID, DEPTH) AS (
+    SELECT ID, PARENT_ID, 1
+    FROM ECOLI_DATA
+    WHERE 1=1
+    AND PARENT_ID IS NULL
+    UNION ALL
+    SELECT A.ID, A.PARENT_ID, B.DEPTH+1
+    FROM ECOLI_DATA AS A
+    JOIN CTE AS B
+    ON(A.PARENT_ID = B.ID)
+)
+SELECT ID
+FROM CTE
+WHERE 1=1
+AND DEPTH = 3
+ORDER BY ID
+;
