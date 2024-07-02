@@ -1,0 +1,33 @@
+/*
+* MYSQL 
+* 계층형 쿼리
+* 계층형 쿼리를 사용하여 자식, 부모 레코드들을 생성한 뒤 자식이 없는 부모들을 세대별로 집계
+*/
+
+-- 임시 테이블 컬럼명 지정
+WITH RECURSIVE CTE(ID, PARENT_ID, DEPTH) AS (
+    -- 초기 시작 부분
+    select ID, PARENT_ID, 1
+    from ECOLI_DATA
+    WHERE 1=1
+    AND PARENT_ID IS NULL
+    -- 반복 부분
+    UNION ALL
+    SELECT A.ID, A.PARENT_ID, B.DEPTH+1
+    FROM ECOLI_DATA AS A
+    INNER JOIN CTE AS B
+    ON A.PARENT_ID = B.ID
+    WHERE 1=1
+)
+SELECT COUNT(*) AS COUNT, DEPTH AS GENERATION
+FROM CTE
+WHERE 1=1
+AND ID NOT IN (
+    SELECT DISTINCT PARENT_ID
+    FROM CTE
+    WHERE 1=1
+    AND PARENT_ID IS NOT NULL
+)
+GROUP BY DEPTH
+ORDER BY DEPTH
+;
